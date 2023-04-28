@@ -1,10 +1,10 @@
 from Model.LogJournal import SSHLogJournal
 import os
 
+def check_if_file_exists(path):
+    return os.path.isfile(path)
 
 def read_from_file(_func):
-    def check_if_file_exists(path):
-        return os.path.isfile(path)
     def wrapper(filepath):
         if check_if_file_exists(filepath):
             with open(filepath, 'r') as logs:
