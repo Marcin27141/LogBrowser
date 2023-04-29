@@ -17,3 +17,6 @@ def read_all_logs(logs):
     for log_line in logs:
         log_journal.append(log_line)
     return log_journal
+
+def filter_logs(logs, predicates):
+    return logs.filter(predicates)

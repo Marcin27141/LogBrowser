@@ -1,5 +1,6 @@
 from Model.SpecificLogCreator import SpecificLogCreator
 from datetime import datetime
+from functools import reduce
 
 class SSHLogJournal:
     SPECIFIC_LOG_CREATOR = SpecificLogCreator()
@@ -20,6 +21,10 @@ class SSHLogJournal:
     def append(self, log_line):
         if (created_log := self.create_proper_log(log_line)):
             self.logs.append(created_log)
+
+    def filter(self, predicates):
+        predicate = reduce(lambda acc, predic: acc and predic, predicates)
+        return [log for log in self.logs if predicate(log)]       
 
     def get_logs_between_dates(self, start, end):
         time_format = r"%d.%m %H:%M:%S"
