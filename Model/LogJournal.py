@@ -23,8 +23,9 @@ class SSHLogJournal:
             self.logs.append(created_log)
 
     def filter(self, predicates):
-        predicate = reduce(lambda acc, predic: acc and predic, predicates)
-        return [log for log in self.logs if predicate(log)]       
+        #predicate = reduce(lambda acc, predic: acc and predic, predicates, True)
+        combined_predicate = lambda x: all(p(x) for p in predicates)
+        return [log for log in self.logs if combined_predicate(log)]       
 
     def get_logs_between_dates(self, start, end):
         time_format = r"%d.%m %H:%M:%S"

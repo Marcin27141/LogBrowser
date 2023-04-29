@@ -40,27 +40,37 @@ class TitleInputWidget(QWidget):
     def clear_value(self):
         self.value.clear()
 
-class DateFilter(QWidget):
+class FromDateFilter(TitleInputWidget):
     def __init__(self):
-        super().__init__()
-        self.date_from = TitleInputWidget("From")
-        self.date_to = TitleInputWidget("To")
-        widget_layout = QHBoxLayout()
-        widget_layout.addWidget(self.date_from)
-        widget_layout.addWidget(self.date_to)
-        self.setLayout(widget_layout)
+        super().__init__("From")
+
+    def get_predicate(self):
+        if (from_date := Controller.try_parse_date(self.value.text())):
+            return (lambda log: from_date < log.log_tuple.date)
+        else:
+            return lambda log: True
+
+class ToDateFilter(TitleInputWidget):
+    def __init__(self):
+        super().__init__("To")
+
+    def get_predicate(self):
+        if (to_date := Controller.try_parse_date(self.value.text())):
+            return (lambda log: log.log_tuple.date < to_date)
+        else:
+            return lambda log: True
 
 class UserFilter(TitleInputWidget):
     def __init__(self):
         super().__init__("Username")
 
     def get_predicate(self):
-        return lambda log: log.username == self.value.text() if self.value.text() else True
+        return (lambda log: log.username == self.value.text()) if self.value.text() else lambda log: True
 
 class FiltersGroupBox(QGroupBox):
-    def __init__(self, filters):
+    def __init__(self):
         super().__init__("Filters")
-        self.filters = filters
+        self.filters = [FromDateFilter(), ToDateFilter(), UserFilter()]
         widget_layout = QVBoxLayout()
         for filter in self.filters:
             widget_layout.addWidget(filter)
@@ -73,7 +83,7 @@ class FiltersGroupWidget(QWidget):
     def __init__(self, logs_list_component):
         super().__init__()
         self.logs_list_component = logs_list_component
-        self.filters_box = FiltersGroupBox([UserFilter()])
+        self.filters_box = FiltersGroupBox()
         self.expand_filters_button = QPushButton('Expand Filters')
         self.filter_button = QPushButton('Filter')
         self.expand_filters_button.clicked.connect(self.toggle_filters)
