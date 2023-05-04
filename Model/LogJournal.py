@@ -6,7 +6,8 @@ class SSHLogJournal:
     SPECIFIC_LOG_CREATOR = SpecificLogCreator()
 
     def __init__(self, logs = []):
-        self.logs = logs
+        self.logs = []
+        self.append_list(logs)
 
     def __len__(self): return len(self.logs)
 
@@ -19,8 +20,16 @@ class SSHLogJournal:
         return self.logs[idx]
     
     def append(self, log_line):
-        if (created_log := self.create_proper_log(log_line)):
+        if (created_log := self.create_proper_log(log_line.strip())):
             self.logs.append(created_log)
+
+    def append_list(self, log_list):
+        for log in log_list:
+            self.append(log)
+
+    def merge(self, other_journal):
+        for log in other_journal:
+            self.logs.append(log)
 
     def filter(self, predicates):
         #predicate = reduce(lambda acc, predic: acc and predic, predicates, True)

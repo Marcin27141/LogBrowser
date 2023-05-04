@@ -3,9 +3,11 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QApplication, QSizePolicy, QMainWindow, QListWidgetItem, QListWidget, QPushButton, QLineEdit, QLabel, QComboBox, QGroupBox, QVBoxLayout, QHBoxLayout, QFormLayout, QWidget
 import sys
-import Controller
+from Controller import Controller
 
 LOG_DATA_ROLE = 100
+global CONTROLLER
+CONTROLLER = Controller()
 
 class TitleValueWidget(QWidget):
     def __init__(self, title) -> None:
@@ -45,7 +47,7 @@ class FromDateFilter(TitleInputWidget):
         super().__init__("From")
 
     def get_predicate(self):
-        if (from_date := Controller.try_parse_date(self.value.text())):
+        if (from_date := CONTROLLER.try_parse_date(self.value.text())):
             return (lambda log: from_date < log.log_tuple.date)
         else:
             return lambda log: True
@@ -55,7 +57,7 @@ class ToDateFilter(TitleInputWidget):
         super().__init__("To")
 
     def get_predicate(self):
-        if (to_date := Controller.try_parse_date(self.value.text())):
+        if (to_date := CONTROLLER.try_parse_date(self.value.text())):
             return (lambda log: log.log_tuple.date < to_date)
         else:
             return lambda log: True
@@ -125,7 +127,7 @@ class OpenFileWidget(QWidget):
 
     def button_clicked(self):
         filepath = self.filepath_input.text()
-        if not Controller.check_if_file_exists(filepath):
+        if not CONTROLLER.check_if_file_exists(filepath):
             self.filepath_input.setText("File doesn't exist")
             self.logs_list_component.clear()
         else:
@@ -162,13 +164,42 @@ class DisplayLogDetailsWidget(QWidget):
 class LogsQListWidget(QListWidget):
     def __init__(self) -> None:
         super().__init__()
+        self.all_logs = None
+        self.filtered_logs = None
+        self.verticalScrollBar().valueChanged.connect(self.add_logs_if_needed)
         self.setMinimumWidth(400)
+
+    def add_logs_if_needed(self, value):
+        if value == self.verticalScrollBar().maximum():
+            new_logs = CONTROLLER.read_chunk_of_logs(self.filepath)
+            self.populate_list(new_logs)
+            self.all_logs.merge(new_logs)
+
+    def initialize_list(self, filepath):
+        self.filepath = filepath
+        self.clear()
+        self.all_logs = CONTROLLER.read_chunk_of_logs(filepath)
+        self.populate_list(self.all_logs)
+
+    def populate_list(self, logs):
+        for log in logs:
+            list_widget = QListWidgetItem(str(log), self)
+            list_widget.setData(LOG_DATA_ROLE, log)
+
+    def filter(self, predicate):
+        if self.all_logs:
+            self.clear()
+            self.filtered_logs = CONTROLLER.filter_logs(self.all_logs, predicate)
+            self.populate_list(self.filtered_logs)
+
+    def clear(self):
+        super().clear()
+        self.clearSelection()
+        
 
 class MasterDetailWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
-        self.original_logs = None
-        self.current_logs = None
         self.master = LogsQListWidget()
         self.detail = DisplayLogDetailsWidget()
         self.master.itemClicked.connect(self.on_master_item_click)
@@ -177,27 +208,9 @@ class MasterDetailWidget(QWidget):
         widget_layout.addWidget(self.detail)
         self.setLayout(widget_layout)
 
-    def populate_list(self):
-        for log in self.current_logs:
-            list_widget = QListWidgetItem(str(log), self.master)
-            list_widget.setData(LOG_DATA_ROLE, log)
-
-    def initialize_list(self, filepath):
-        self.clear()
-        self.original_logs = Controller.read_all_logs(filepath)
-        self.current_logs = self.original_logs
-        self.populate_list()
-
     def clear(self):
-        self.master.clearSelection()
         self.master.clear()
         self.detail.clear_details()
-
-    def filter(self, predicate):
-        if self.original_logs:
-            self.clear()
-            self.current_logs = Controller.filter_logs(self.original_logs, predicate)
-            self.populate_list()
         
     def on_master_item_click(self, item):
         log = item.data(LOG_DATA_ROLE)
@@ -257,7 +270,7 @@ class ApplicationLayout(QVBoxLayout):
     def __init__(self):
         super().__init__()
         self.master_detail = MasterDetailWithButtonsWidget()
-        self.file_opener = OpenFileWidget(self.master_detail)
+        self.file_opener = OpenFileWidget(self.master_detail.master)
         self.filter_widget = FiltersGroupWidget(self.master_detail)
         self.addWidget(self.file_opener)
         self.addWidget(self.filter_widget, 0, alignment=Qt.AlignHCenter)
