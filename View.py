@@ -84,7 +84,8 @@ class FiltersGroupWidget(QWidget):
         super().__init__()
         self.logs_list_component = logs_list_component
         self.filters_box = FiltersGroupBox()
-        self.expand_filters_button = QPushButton('Expand Filters')
+        self.filters_box.hide()
+        self.expand_filters_button = QPushButton('Show Filters')
         self.filter_button = QPushButton('Filter')
         self.expand_filters_button.clicked.connect(self.toggle_filters)
         self.filter_button.clicked.connect(self.filter_logs)
