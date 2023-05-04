@@ -97,7 +97,7 @@ class FiltersGroupWidget(QWidget):
         widget_layout.addWidget(self.filters_box)
         #widget_layout.setContentsMargins(30,0,0,0)
         self.setLayout(widget_layout)
-        #self.setMaximumWidth(400)
+        self.setMinimumWidth(400)
 
     def toggle_filters(self):
         if self.filters_box.isVisible():
@@ -260,7 +260,7 @@ class ApplicationLayout(QVBoxLayout):
         self.file_opener = OpenFileWidget(self.master_detail)
         self.filter_widget = FiltersGroupWidget(self.master_detail)
         self.addWidget(self.file_opener)
-        self.addWidget(self.filter_widget)
+        self.addWidget(self.filter_widget, 0, alignment=Qt.AlignHCenter)
         self.addWidget(self.master_detail)
 
 class LogsAppMainWindow(QMainWindow):
