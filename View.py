@@ -150,7 +150,7 @@ class DisplayLogDetailsWidget(QWidget):
     
     def display_details(self, log):
         self.user_display.update_value(log.username)
-        self.ip_display.update_value(log.ip_addresses[0] if log.ip_addresses else None)
+        self.ip_display.update_value(log.ip_addresses[0] if log.ip_addresses else "")
         self.date_display.update_value(log.log_tuple.date)
         self.pid_display.update_value(log.log_tuple.pid)
 
@@ -193,6 +193,7 @@ class LogsQListWidget(QListWidget):
             self.populate_list(self.filtered_logs)
 
     def clear(self):
+        self.scrollToTop()
         super().clear()
         self.clearSelection()
         
@@ -210,6 +211,14 @@ class MasterDetailWidget(QWidget):
 
     def clear(self):
         self.master.clear()
+        self.detail.clear_details()
+
+    def initialize_list(self, filepath):
+        self.master.initialize_list(filepath)
+        self.detail.clear_details()
+
+    def filter(self, predicate):
+        self.master.filter(predicate)
         self.detail.clear_details()
         
     def on_master_item_click(self, item):
@@ -270,7 +279,7 @@ class ApplicationLayout(QVBoxLayout):
     def __init__(self):
         super().__init__()
         self.master_detail = MasterDetailWithButtonsWidget()
-        self.file_opener = OpenFileWidget(self.master_detail.master)
+        self.file_opener = OpenFileWidget(self.master_detail)
         self.filter_widget = FiltersGroupWidget(self.master_detail)
         self.addWidget(self.file_opener)
         self.addWidget(self.filter_widget, 0, alignment=Qt.AlignHCenter)

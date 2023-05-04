@@ -37,7 +37,7 @@ class Controller:
             return None
 
 class LinesReader:
-    LINES_CHUNK = 10
+    LINES_CHUNK = 20
     def __init__(self, filepath):
         self.filepath = filepath
         self.lines_read = 0
