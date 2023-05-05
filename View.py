@@ -78,6 +78,10 @@ class FiltersGroupBox(QGroupBox):
             widget_layout.addWidget(filter)
         self.setLayout(widget_layout)
 
+    def clear(self):
+        for filter in self.filters:
+            filter.clear_value()
+
     def get_filters_predicates(self):
         predicates = [_filter.get_predicate() for _filter in self.filters]
         return [predicate for predicate in predicates if predicate]
@@ -91,6 +95,7 @@ class FiltersGroupWidget(QWidget):
         self.clear_filters_button = QPushButton('Clear Filters')
         self.expand_filters_button = QPushButton('Show Filters')
         self.filter_button = QPushButton('Filter')
+        self.clear_filters_button.clicked.connect(self.clear_filters)
         self.expand_filters_button.clicked.connect(self.toggle_filters)
         self.filter_button.clicked.connect(self.filter_logs)
         buttons_layout = QHBoxLayout()
@@ -103,6 +108,10 @@ class FiltersGroupWidget(QWidget):
         #widget_layout.setContentsMargins(30,0,0,0)
         self.setLayout(widget_layout)
         self.setMinimumWidth(400)
+
+    def clear_filters(self):
+        self.filters_box.clear()
+        self.logs_list_component.reset_filters()
 
     def toggle_filters(self):
         if self.filters_box.isVisible():
