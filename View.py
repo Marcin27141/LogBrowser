@@ -170,7 +170,7 @@ class DisplayLogDetailsWidget(QWidget):
         self.setLayout(widget_layout)
     
     def display_details(self, log):
-        self.user_display.update_value(log.username)
+        self.user_display.update_value(log.username if log.username else "")
         self.ip_display.update_value(log.ip_addresses[0] if log.ip_addresses else "")
         self.date_display.update_value(CONTROLLER.present_date_in_log_format(log.log_tuple.date))
         self.pid_display.update_value(log.log_tuple.pid)
