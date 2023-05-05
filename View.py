@@ -172,7 +172,7 @@ class DisplayLogDetailsWidget(QWidget):
     def display_details(self, log):
         self.user_display.update_value(log.username)
         self.ip_display.update_value(log.ip_addresses[0] if log.ip_addresses else "")
-        self.date_display.update_value(log.log_tuple.date)
+        self.date_display.update_value(CONTROLLER.present_date_in_log_format(log.log_tuple.date))
         self.pid_display.update_value(log.log_tuple.pid)
 
     def clear_details(self):
@@ -191,7 +191,7 @@ class LogsQListWidget(QListWidget):
         self.setMinimumWidth(400)
 
     def add_logs_if_needed(self, value):
-        if value == self.verticalScrollBar().maximum():
+        if value == self.verticalScrollBar().maximum() and not self.filtered_logs:
             new_logs = CONTROLLER.read_chunk_of_logs(self.filepath)
             self.populate_list(new_logs)
             self.all_logs.merge(new_logs)

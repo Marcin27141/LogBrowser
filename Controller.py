@@ -37,6 +37,9 @@ class Controller:
     def filter_logs(self, logs, predicates):
         return logs.filter(predicates)
     
+    def present_date_in_log_format(self, date):
+        return date.strftime(SSH_DATE_FORMAT)
+    
     def try_parse_date(self, date):
         try:
             return datetime.strptime(date, SSH_DATE_FORMAT)
