@@ -50,7 +50,7 @@ class FromDateFilter(TitleInputWidget):
         if (from_date := CONTROLLER.try_parse_date(self.value.text())):
             return (lambda log: from_date < log.log_tuple.date)
         else:
-            return lambda log: True
+            return None
 
 class ToDateFilter(TitleInputWidget):
     def __init__(self):
@@ -60,14 +60,14 @@ class ToDateFilter(TitleInputWidget):
         if (to_date := CONTROLLER.try_parse_date(self.value.text())):
             return (lambda log: log.log_tuple.date < to_date)
         else:
-            return lambda log: True
+            return None
 
 class UserFilter(TitleInputWidget):
     def __init__(self):
         super().__init__("Username")
 
     def get_predicate(self):
-        return (lambda log: log.username == self.value.text()) if self.value.text() else lambda log: True
+        return (lambda log: log.username == self.value.text()) if self.value.text() else None
 
 class FiltersGroupBox(QGroupBox):
     def __init__(self):
@@ -79,7 +79,8 @@ class FiltersGroupBox(QGroupBox):
         self.setLayout(widget_layout)
 
     def get_filters_predicates(self):
-        return [_filter.get_predicate() for _filter in self.filters]
+        predicates = [_filter.get_predicate() for _filter in self.filters]
+        return [predicate for predicate in predicates if predicate]
 
 class FiltersGroupWidget(QWidget):
     def __init__(self, logs_list_component):
@@ -110,7 +111,8 @@ class FiltersGroupWidget(QWidget):
             self.expand_filters_button.setText('Hide Filters')
 
     def filter_logs(self):
-        self.logs_list_component.filter(self.filters_box.get_filters_predicates())
+        filters = self.filters_box.get_filters_predicates()
+        self.logs_list_component.filter(filters) if len(filters) > 0 else self.logs_list_component.reset_filters()
 
 
 class OpenFileWidget(QWidget):
@@ -192,6 +194,11 @@ class LogsQListWidget(QListWidget):
             self.filtered_logs = CONTROLLER.filter_logs(self.all_logs, predicate)
             self.populate_list(self.filtered_logs)
 
+    def reset_filters(self):
+        self.clear()
+        self.filtered_logs = None
+        self.populate_list(self.all_logs)
+
     def clear(self):
         self.scrollToTop()
         super().clear()
@@ -219,6 +226,10 @@ class MasterDetailWidget(QWidget):
 
     def filter(self, predicate):
         self.master.filter(predicate)
+        self.detail.clear_details()
+
+    def reset_filters(self):
+        self.master.reset_filters()
         self.detail.clear_details()
         
     def on_master_item_click(self, item):
