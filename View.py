@@ -88,11 +88,13 @@ class FiltersGroupWidget(QWidget):
         self.logs_list_component = logs_list_component
         self.filters_box = FiltersGroupBox()
         self.filters_box.hide()
+        self.clear_filters_button = QPushButton('Clear Filters')
         self.expand_filters_button = QPushButton('Show Filters')
         self.filter_button = QPushButton('Filter')
         self.expand_filters_button.clicked.connect(self.toggle_filters)
         self.filter_button.clicked.connect(self.filter_logs)
         buttons_layout = QHBoxLayout()
+        buttons_layout.addWidget(self.clear_filters_button)
         buttons_layout.addWidget(self.expand_filters_button)
         buttons_layout.addWidget(self.filter_button)
         widget_layout = QVBoxLayout()
@@ -195,9 +197,10 @@ class LogsQListWidget(QListWidget):
             self.populate_list(self.filtered_logs)
 
     def reset_filters(self):
-        self.clear()
-        self.filtered_logs = None
-        self.populate_list(self.all_logs)
+        if self.filtered_logs:
+            self.clear()
+            self.filtered_logs = None
+            self.populate_list(self.all_logs)
 
     def clear(self):
         self.scrollToTop()
