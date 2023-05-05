@@ -75,7 +75,7 @@ class IpAddressFilter(TitleInputWidget):
         super().__init__("IP address")
 
     def get_predicate(self):
-        return (lambda log: log.ip_addresses and log.ip_addresses[0] == self.value.text()) if self.value.text() else None
+        return (lambda log: log.ip_addresses and format(log.ip_addresses[0]) == self.value.text()) if self.value.text() else None
 
 class FiltersGroupBox(QGroupBox):
     def __init__(self):
