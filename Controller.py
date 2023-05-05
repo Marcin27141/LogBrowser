@@ -22,6 +22,13 @@ class Controller:
         contents = self.read_from_file(filepath)
         return SSHLogJournal(contents)
     
+    def get_first_chunk_of_logs(self, filepath):
+        if self.lines_reader and self.lines_reader.filepath == filepath:
+            self.lines_reader.reset()
+        else:
+            self.lines_reader = LinesReader(filepath)
+        return SSHLogJournal(self.lines_reader.read_chunk())
+    
     def read_chunk_of_logs(self, filepath):
         if not self.lines_reader or self.lines_reader.filepath != filepath:
             self.lines_reader = LinesReader(filepath)
@@ -37,7 +44,7 @@ class Controller:
             return None
 
 class LinesReader:
-    LINES_CHUNK = 20
+    LINES_CHUNK = 100
     def __init__(self, filepath):
         self.filepath = filepath
         self.lines_read = 0
@@ -51,3 +58,6 @@ class LinesReader:
                 result = [line.strip() for line in islice(contents, self.lines_read, self.lines_read + self.LINES_CHUNK)]
                 self.lines_read += len(result)
                 return result
+            
+    def reset(self):
+        self.lines_read = 0

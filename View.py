@@ -68,11 +68,19 @@ class UserFilter(TitleInputWidget):
 
     def get_predicate(self):
         return (lambda log: log.username == self.value.text()) if self.value.text() else None
+    
+
+class IpAddressFilter(TitleInputWidget):
+    def __init__(self):
+        super().__init__("IP address")
+
+    def get_predicate(self):
+        return (lambda log: log.ip_addresses and log.ip_addresses[0] == self.value.text()) if self.value.text() else None
 
 class FiltersGroupBox(QGroupBox):
     def __init__(self):
         super().__init__("Filters")
-        self.filters = [FromDateFilter(), ToDateFilter(), UserFilter()]
+        self.filters = [UserFilter(), IpAddressFilter(), FromDateFilter(), ToDateFilter()]
         widget_layout = QVBoxLayout()
         for filter in self.filters:
             widget_layout.addWidget(filter)
@@ -191,7 +199,7 @@ class LogsQListWidget(QListWidget):
     def initialize_list(self, filepath):
         self.filepath = filepath
         self.clear()
-        self.all_logs = CONTROLLER.read_chunk_of_logs(filepath)
+        self.all_logs = CONTROLLER.get_first_chunk_of_logs(filepath)
         self.populate_list(self.all_logs)
 
     def populate_list(self, logs):
