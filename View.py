@@ -185,17 +185,22 @@ class DisplayLogDetailsWidget(QWidget):
 class LogsQListWidget(QListWidget):
     def __init__(self) -> None:
         super().__init__()
+        self.all_chunks_loaded = False
         self.all_logs = None
         self.filtered_logs = None
+        self.last_filter = None
         self.verticalScrollBar().valueChanged.connect(self.add_logs_if_needed)
         self.setMinimumWidth(400)
 
     def add_logs_if_needed(self, value):
         not_enough_for_scrollbar = self.verticalScrollBar().maximum() == 0
         reached_end_of_scrollbar = self.verticalScrollBar().maximum() == value
-        if (not_enough_for_scrollbar or  reached_end_of_scrollbar) and not self.filtered_logs:
+        if (not_enough_for_scrollbar or  reached_end_of_scrollbar) and not self.all_chunks_loaded:
             new_logs = CONTROLLER.read_chunk_of_logs(self.filepath)
+            if len(new_logs) == 0: self.all_chunks_loaded = True
             self.all_logs.merge(new_logs)
+            if self.filtered_logs != None:
+                new_logs = CONTROLLER.filter_logs(new_logs, self.last_filter)
             self.populate_list(new_logs)
             
     def initialize_list(self, filepath):
@@ -213,6 +218,7 @@ class LogsQListWidget(QListWidget):
 
     def filter(self, predicate):
         if self.all_logs:
+            self.last_filter = predicate
             self.clear()
             self.filtered_logs = CONTROLLER.filter_logs(self.all_logs, predicate)
             self.populate_list(self.filtered_logs)
