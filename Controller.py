@@ -5,6 +5,8 @@ from datetime import datetime
 from itertools import islice
 
 class Controller:
+    LOG_DATA_ROLE = 100
+
     def __init__(self):
         self.filepath = None
         self.lines_reader = None
