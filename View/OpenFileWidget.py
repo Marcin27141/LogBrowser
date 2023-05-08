@@ -17,6 +17,5 @@ class OpenFileWidget(QWidget):
         filepath = self.filepath_input.text()
         if not self.controller.check_if_file_exists(filepath):
             self.filepath_input.setText("File doesn't exist")
-            self.logs_list_component.clear()
         else:
             self.logs_list_component.initialize_list(filepath)
