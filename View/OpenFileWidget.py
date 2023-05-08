@@ -7,15 +7,18 @@ class OpenFileWidget(QWidget):
         self.logs_list_component = logs_list_component
         self.filepath_input = QLineEdit()
         self.open_button = QPushButton("Open")
-        self.open_button.clicked.connect(self.try_load_file)
         self.not_found_label = QLabel()
+        self.setLayout(self.get_widget_layout())
+        self.open_button.clicked.connect(self.try_load_file)
+
+    def get_widget_layout(self):
         widget_layout = QVBoxLayout()
         upper_layout = QHBoxLayout()
         upper_layout.addWidget(self.filepath_input)
         upper_layout.addWidget(self.open_button)
         widget_layout.addLayout(upper_layout)
         widget_layout.addWidget(self.not_found_label)
-        self.setLayout(widget_layout)
+        return widget_layout
 
     def try_load_file(self):
         filepath = self.filepath_input.text()
