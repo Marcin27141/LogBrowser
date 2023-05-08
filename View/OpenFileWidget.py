@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QLineEdit, QPushButton, QHBoxLayout, QWidget
+from PySide6.QtWidgets import QLineEdit, QPushButton, QHBoxLayout, QVBoxLayout, QWidget, QLabel
 
 class OpenFileWidget(QWidget):
     def __init__(self, controller, logs_list_component) -> None:
@@ -7,15 +7,20 @@ class OpenFileWidget(QWidget):
         self.logs_list_component = logs_list_component
         self.filepath_input = QLineEdit()
         self.open_button = QPushButton("Open")
-        self.open_button.clicked.connect(self.button_clicked)
-        widget_layout = QHBoxLayout()
-        widget_layout.addWidget(self.filepath_input)
-        widget_layout.addWidget(self.open_button)
+        self.open_button.clicked.connect(self.try_load_file)
+        self.not_found_label = QLabel()
+        widget_layout = QVBoxLayout()
+        upper_layout = QHBoxLayout()
+        upper_layout.addWidget(self.filepath_input)
+        upper_layout.addWidget(self.open_button)
+        widget_layout.addLayout(upper_layout)
+        widget_layout.addWidget(self.not_found_label)
         self.setLayout(widget_layout)
 
-    def button_clicked(self):
+    def try_load_file(self):
         filepath = self.filepath_input.text()
         if not self.controller.check_if_file_exists(filepath):
-            self.filepath_input.setText("File doesn't exist")
+            self.not_found_label.setText("File not found")
         else:
+            self.not_found_label.clear()
             self.logs_list_component.initialize_list(filepath)
