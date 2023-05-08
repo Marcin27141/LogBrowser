@@ -23,8 +23,8 @@ class LogsQListWidget(QListWidget):
             self.populate_list(new_logs)
             
     def initialize_list(self, filepath):
+        self.reset_widget()
         self.filepath = filepath
-        self.clear()
         self.all_logs = self.controller.get_first_chunk_of_logs(filepath)
         self.populate_list(self.all_logs)
 
@@ -48,8 +48,14 @@ class LogsQListWidget(QListWidget):
             self.filtered_logs = None
             self.populate_list(self.all_logs)
 
+    def reset_widget(self):
+        self.filtered_logs = None
+        self.last_filter = None
+        self.all_chunks_loaded = False
+        self.clear()
+
     def clear(self):
-        self.scrollToTop()
         super().clear()
+        self.scrollToTop()
         self.clearSelection()
         
