@@ -37,7 +37,10 @@ class Controller:
         return SSHLogJournal(self.lines_reader.read_chunk())
 
     def filter_logs(self, logs, predicates):
-        return logs.filter(predicates)
+        filtered_logs = logs.filter(predicates)
+        filtered_list = SSHLogJournal()
+        filtered_list.set_logs(filtered_logs)
+        return filtered_list
     
     def present_date_in_log_format(self, date):
         return date.strftime(SSH_DATE_FORMAT)

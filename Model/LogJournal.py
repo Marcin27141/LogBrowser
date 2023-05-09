@@ -32,7 +32,6 @@ class SSHLogJournal:
             self.logs.append(log)
 
     def filter(self, predicates):
-        #predicate = reduce(lambda acc, predic: acc and predic, predicates, True)
         combined_predicate = lambda x: all(p(x) for p in predicates)
         return [log for log in self.logs if combined_predicate(log)]       
 
@@ -44,6 +43,9 @@ class SSHLogJournal:
             return [log for log in self.logs if start_time <= log.log_tuple.date <= end_time]
         except ValueError:
             print(f"Date format was incorrect. Correct format: {time_format}")
+
+    def set_logs(self, logs):
+        self.logs = logs
 
     @staticmethod
     def create_proper_log(log_line):

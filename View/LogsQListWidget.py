@@ -20,6 +20,7 @@ class LogsQListWidget(QListWidget):
             self.all_logs.merge(new_logs)
             if self.filtered_logs != None:
                 new_logs = self.controller.filter_logs(new_logs, self.last_filter)
+                self.filtered_logs.merge(new_logs)
             self.populate_list(new_logs)
             
     def initialize_list(self, filepath):
