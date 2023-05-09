@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget
+from PySide6.QtWidgets import QApplication
 from View.LogsAppMainWindow import LogsAppMainWindow
-import sys
 from Controller import Controller
+import sys
 
 controller = Controller()
 app = QApplication(sys.argv)

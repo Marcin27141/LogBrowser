@@ -9,6 +9,7 @@ class MasterDetailWithButtonsWidget(MasterDetailWidget):
         self.next_button = QPushButton("Next")
         self.previous_button.setEnabled(False)
         self.next_button.setEnabled(False)
+
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(self.previous_button, 0, alignment=Qt.AlignLeft)
         buttons_layout.addWidget(self.next_button, 0, alignment=Qt.AlignRight)
@@ -18,6 +19,7 @@ class MasterDetailWithButtonsWidget(MasterDetailWidget):
         new_layout.addWidget(super_widget)
         new_layout.addLayout(buttons_layout)
         self.setLayout(new_layout)
+        
         self.next_button.clicked.connect(self.select_next_item)
         self.previous_button.clicked.connect(self.select_previous_item)
         self.master.currentRowChanged.connect(self.on_current_row_changed)
