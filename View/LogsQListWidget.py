@@ -49,9 +49,8 @@ class LogsQListWidget(QListWidget):
             self.all_logs.merge(new_logs)
             if self.filtered_logs != None:
                 new_logs = self.controller.filter_logs(new_logs, self.last_filter)
-                print(type(self.last_filter[0]))
                 if len(new_logs) > 0: self.filtered_logs.merge(new_logs)
-                elif all(isinstance(filter, (FromDateFilter.get_predicate, ToDateFilter.get_predicate)) for filter in self.last_filter):
+                elif any(not isinstance(filter, (FromDateFilter, ToDateFilter)) for filter in self.last_filter):
                     self.load_next_chunk_of_logs()
             self.populate_list(new_logs)
             
@@ -70,12 +69,12 @@ class LogsQListWidget(QListWidget):
         self.doItemsLayout()
         self.add_logs_if_needed(-1)
 
-    def filter(self, predicate):
+    def filter(self, filters):
         if self.all_logs:
-            self.last_filter = predicate
+            self.last_filter = filters
             self.clear()
             self.num_of_loaded_and_displayed = 0
-            self.filtered_logs = self.controller.filter_logs(self.all_logs, predicate)
+            self.filtered_logs = self.controller.filter_logs(self.all_logs, filters)
             self.populate_list(self.filtered_logs)
 
     def reset_filters(self):

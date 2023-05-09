@@ -15,5 +15,4 @@ class FiltersGroupBox(QGroupBox):
             filter.clear_value()
 
     def get_filters_predicates(self):
-        predicates = [_filter.get_predicate() for _filter in self.filters]
-        return [predicate for predicate in predicates if predicate]
+        return [_filter for _filter in self.filters if _filter.get_predicate() != None]

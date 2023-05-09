@@ -31,8 +31,10 @@ class SSHLogJournal:
         for log in other_journal:
             self.logs.append(log)
 
-    def filter(self, predicates):
-        combined_predicate = lambda x: all(p(x) for p in predicates)
+    def filter(self, filters):
+        predicates = [filter.get_predicate() for filter in filters]
+        predicates = [predicate for predicate in predicates if predicate]
+        combined_predicate = lambda x: all(predicate(x) for predicate in predicates)
         return [log for log in self.logs if combined_predicate(log)]       
 
     def get_logs_between_dates(self, start, end):

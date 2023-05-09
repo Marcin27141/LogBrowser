@@ -36,8 +36,8 @@ class Controller:
             self.lines_reader = LinesReader(filepath)
         return SSHLogJournal(self.lines_reader.read_chunk())
 
-    def filter_logs(self, logs, predicates):
-        filtered_logs = logs.filter(predicates)
+    def filter_logs(self, logs, filters):
+        filtered_logs = logs.filter(filters)
         filtered_list = SSHLogJournal()
         filtered_list.set_logs(filtered_logs)
         return filtered_list
