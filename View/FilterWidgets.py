@@ -7,7 +7,7 @@ class FromDateFilter(TitleInputWidget):
 
     def get_predicate(self):
         if (from_date := self.controller.try_parse_date(self.value.text())):
-            return (lambda log: from_date < log.log_tuple.date)
+            return (lambda log: from_date <= log.log_tuple.date)
         else:
             return None
 
@@ -18,7 +18,7 @@ class ToDateFilter(TitleInputWidget):
 
     def get_predicate(self):
         if (to_date := self.controller.try_parse_date(self.value.text())):
-            return (lambda log: log.log_tuple.date < to_date)
+            return (lambda log: log.log_tuple.date <= to_date)
         else:
             return None
 

@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QListWidget, QListWidgetItem
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QApplication
 from View.FilterWidgets import FromDateFilter, ToDateFilter
 
 class LogsQListWidget(QListWidget):
-    LOADED_CHUNK_SIZE = 100
+    LOADED_CHUNK_SIZE = 50
     
     def __init__(self, controller) -> None:
         super().__init__()
@@ -14,18 +15,6 @@ class LogsQListWidget(QListWidget):
         self.num_of_loaded_and_displayed = 0
         self.verticalScrollBar().valueChanged.connect(self.add_logs_if_needed)
         self.setMinimumWidth(400)
-
-    """def add_logs_if_needed(self, value):
-        not_enough_for_scrollbar = self.verticalScrollBar().maximum() == 0
-        reached_end_of_scrollbar = self.verticalScrollBar().maximum() == value
-        if (not_enough_for_scrollbar or  reached_end_of_scrollbar) and not self.all_chunks_loaded:
-            new_logs = self.controller.read_chunk_of_logs(self.filepath)
-            if len(new_logs) == 0: self.all_chunks_loaded = True
-            self.all_logs.merge(new_logs)
-            if self.filtered_logs != None:
-                new_logs = self.controller.filter_logs(new_logs, self.last_filter)
-                self.filtered_logs.merge(new_logs)
-            self.populate_list(new_logs)"""
     
     def add_logs_if_needed(self, value):
         displayed_logs = self.filtered_logs if self.filtered_logs != None else self.all_logs
@@ -70,18 +59,21 @@ class LogsQListWidget(QListWidget):
         self.add_logs_if_needed(-1)
 
     def filter(self, filters):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         if self.all_logs:
             self.last_filter = filters
             self.clear()
             self.num_of_loaded_and_displayed = 0
             self.filtered_logs = self.controller.filter_logs(self.all_logs, filters)
             self.populate_list(self.filtered_logs)
+        QApplication.restoreOverrideCursor()
 
     def reset_filters(self):
-        if self.filtered_logs:
+        if self.last_filter != None:
             self.clear()
             self.filtered_logs = None
             self.populate_list(self.all_logs)
+        self.last_filter = None
 
     def reset_widget(self):
         self.filtered_logs = None
