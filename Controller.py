@@ -1,5 +1,5 @@
 from Model.LogJournal import SSHLogJournal
-from Model.SSH_Logs import SSH_DATE_FORMAT
+from Model.SSHLogConverter import SSH_DATE_FORMAT
 import os
 from datetime import datetime
 from itertools import islice

@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod
-from ipaddress import IPv4Address
-from Model.Lab5_1 import SSH_Log
-import Model.Lab5_1
+from abc import ABC
 import Model.RegexExtensions
+from ipaddress import IPv4Address
+from Model.SSHLogConverter import SSH_Log, convert_line_to_ssh_tuple
 import re
 class SSHLogEntry(ABC):
     def __init__(self, line):
@@ -10,7 +9,7 @@ class SSHLogEntry(ABC):
         self.username = None 
         self.ip_addresses = None
 
-        self.log_tuple: SSH_Log = Model.Lab5_1.convert_line_to_ssh_tuple(line)
+        self.log_tuple: SSH_Log = convert_line_to_ssh_tuple(line)
         if (self.log_tuple):
             self.username = self.__get_log_username()
             self.ip_addresses = self.__get_ip_addresses()
@@ -37,10 +36,13 @@ class SSHLogEntry(ABC):
         return re.search(pattern, self.log_tuple.description) if self.log_tuple else None
     
     def __get_ip_addresses(self):
-        return [IPv4Address(ip_address) for ip_address in Model.Lab5_1.get_ipv4s_from_log(self.log_tuple)]
+        IP_REGEX_STRING = r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}"
+        ipv4s = list(re.findall(IP_REGEX_STRING, self.log_tuple.description))
+        return [IPv4Address(ip_address) for ip_address in ipv4s]
     
     def __get_log_username(self):
-        return Model.Lab5_1.get_user_from_log(self.log_tuple)
+        USER_REGEX_STRING = r"(?<=\suser\s)\S+"
+        return _match.group() if (_match := re.search(USER_REGEX_STRING, self.log_tuple.description)) else None
 
     @property
     def has_ip(self):
@@ -48,15 +50,3 @@ class SSHLogEntry(ABC):
 
     def validate(self):
         return self.log_tuple != None
-
-
-"""myLog = SSHLogInformation("Dec 10 06:55:46 LabSZ sshd[24200]: Invalid user webmaster from 173.234.31.186")
-myLog2 = SSHLogInformation("Dec 12 06:55:46 LabSZ sshd[24200]: Invalid user webmaster from 173.234.31.186")
-print(myLog == myLog2)
-print(myLog < myLog2)
-print(myLog > myLog2)"""
-"""fail_log = SSHLogPasswordFailed("Dec 10 07:27:55 LabSZ sshd[24237]: Failed password for root from 112.95.230.3 port 47068 ssh2")
-print(fail_log)
-print(fail_log.log_tuple)
-print(fail_log.get_ip_addresses())
-print(fail_log.validate("Dec 10 07:27:55 LabSZ sshd[24237]: Failed password for root from 112.95.230.3 port 47068 ssh2"))"""

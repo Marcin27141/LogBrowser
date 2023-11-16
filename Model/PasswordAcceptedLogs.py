@@ -42,18 +42,3 @@ class SSHPasswordAcceptedLog(SSHLogEntry):
     def validate(self):
         return super().validate() and bool(self._log_match)
     
-"""myLog = SSHPasswordAcceptedLog("Dec 10 06:55:46 LabSZ sshd[24200]: Invalid user webmaster from 173.234.31.186")
-myLog2 = SSHPasswordAcceptedLog("Dec 10 09:32:20 LabSZ sshd[24680]: Accepted password for fztu from 119.137.62.142 port 49116 ssh2")
-print(myLog.validate())
-print(myLog2.validate())"""
-
-"""myLog = SSHLogInformation("Dec 10 06:55:46 LabSZ sshd[24200]: Invalid user webmaster from 173.234.31.186")
-myLog2 = SSHLogInformation("Dec 12 06:55:46 LabSZ sshd[24200]: Invalid user webmaster from 173.234.31.186")
-print(myLog == myLog2)
-print(myLog < myLog2)
-print(myLog > myLog2)"""
-"""fail_log = SSHLogPasswordFailed("Dec 10 07:27:55 LabSZ sshd[24237]: Failed password for root from 112.95.230.3 port 47068 ssh2")
-print(fail_log)
-print(fail_log.log_tuple)
-print(fail_log.get_ip_addresses())
-print(fail_log.validate("Dec 10 07:27:55 LabSZ sshd[24237]: Failed password for root from 112.95.230.3 port 47068 ssh2"))"""
